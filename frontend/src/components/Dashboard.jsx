@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Card from "./Card";
 import { getDashboard } from "../services/api";
+import Users from "./Users";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -23,7 +24,7 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div
+    <div 
         style={{
           flex: 1,
           display: "flex",
@@ -32,15 +33,20 @@ function Dashboard() {
           color: "white",
           fontSize: "24px",
         }}
-      >
+        >
         Loading Dashboard...
       </div>
     );
   }
 
   return (
-    <div style={{ flex: 1, padding: "40px" }}>
-      <h1 style={{ color: "white", textAlign: "center", fontSize: "60px" }}>
+    <div>
+     <h1 
+      style={{
+      color:"white",
+      textAlign:"center",
+      fontSize:"50px"
+}}>
         Dashboard
       </h1>
 
@@ -56,13 +62,13 @@ function Dashboard() {
 
       <div
         style={{
-          display: "flex",
-          gap: "25px",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          marginTop: "40px",
+        display:"flex",
+        gap:"25px",
+        flexWrap:"wrap",
+        justifyContent:"center",
+        marginTop:"40px"
         }}
-      >
+        >
         <Card
           title="Users"
           value={dashboardData.users}
@@ -87,6 +93,7 @@ function Dashboard() {
           color="#EF4444"
         />
       </div>
+      <Users />
     </div>
   );
 }

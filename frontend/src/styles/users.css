@@ -1,0 +1,40 @@
+.users-container {
+    margin-top: 60px;
+}
+
+.users-title {
+    color: white;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1F2937;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.users-table th {
+    background: #111827;
+    color: #E5E7EB;
+    padding: 16px;
+    text-align: left;
+    font-size: 18px;
+}
+
+.users-table td {
+    padding: 16px;
+    color: #D1D5DB;
+    border-top: 1px solid #374151;
+}
+
+.users-table tr:nth-child(even) {
+    background: #273449;
+}
+
+.users-table tr:hover {
+    background: #374151;
+    transition: 0.2s;
+}

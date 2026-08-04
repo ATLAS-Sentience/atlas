@@ -1,23 +1,26 @@
+import { Outlet } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import Dashboard from "../components/Dashboard";
 
-import "../styles/global.css";
+function Home(){
 
-function Home() {
-  return (
-    <>
-      <Navbar />
+    return(
+        <>
+            <Navbar />
 
-      <div className="layout">
-        <Sidebar />
+            <div className="layout">
 
-        <main className="content">
-          <Dashboard />
-        </main>
-      </div>
-    </>
-  );
+                <Sidebar />
+
+                <div className="content">
+                    <Outlet />
+                </div>
+
+            </div>
+        </>
+    );
+
 }
 
 export default Home;
