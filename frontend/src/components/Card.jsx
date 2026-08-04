@@ -1,3 +1,4 @@
+import "../styles/card.css";
 function Card({ title, value, color }) {
   return (
     <div

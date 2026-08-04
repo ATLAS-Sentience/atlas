@@ -1,14 +1,8 @@
+import "../styles/sidebar.css";
+
 function Sidebar() {
   return (
-    <aside
-      style={{
-        width: "220px",
-        background: "#1F2937",
-        color: "white",
-        height: "calc(100vh - 70px)",
-        padding: "20px"
-      }}
-    >
+    <aside className="sidebar">
       <h3>Menu</h3>
 
       <p>🏠 Home</p>

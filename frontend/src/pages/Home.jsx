@@ -2,14 +2,19 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Dashboard from "../components/Dashboard";
 
+import "../styles/global.css";
+
 function Home() {
   return (
     <>
       <Navbar />
 
-      <div style={{ display: "flex" }}>
+      <div className="layout">
         <Sidebar />
-        <Dashboard />
+
+        <main className="content">
+          <Dashboard />
+        </main>
       </div>
     </>
   );

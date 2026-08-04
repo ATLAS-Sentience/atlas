@@ -1,21 +1,32 @@
-function Navbar() {
-  return (
-    <nav
-      style={{
-        height: "70px",
-        background: "#111827",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 30px",
-        color: "white"
-      }}
-    >
-      <h2>ATLAS</h2>
+import "../styles/navbar.css";
 
-      <div>👤 User</div>
-    </nav>
-  );
+import { FiMenu } from "react-icons/fi";
+
+function Navbar({ sidebarOpen, setSidebarOpen }) {
+
+    return (
+
+        <nav className="navbar">
+
+            <button
+                className="menu-button"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+                <FiMenu />
+            </button>
+
+            <h2 className="logo">
+                ATLAS
+            </h2>
+
+            <div className="user">
+                👤 User
+            </div>
+
+        </nav>
+
+    );
+
 }
 
 export default Navbar;
