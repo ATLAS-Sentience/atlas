@@ -7,17 +7,31 @@ function Home(){
 
     return(
         <>
+
             <Navbar />
 
-            <div className="layout">
+            <div 
+                className="layout"
+                style={{
+                    display:"flex",
+                    width:"100%",
+                }}
+            >
 
                 <Sidebar />
 
-                <div className="content">
+                <div 
+                    className="content"
+                    style={{
+                        flex:1,
+                        padding:"20px",
+                    }}
+                >
                     <Outlet />
                 </div>
 
             </div>
+
         </>
     );
 
