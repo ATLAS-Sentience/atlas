@@ -1,9 +1,56 @@
-@media (max-width:768px){
+.card {
 
-    .card{
+    background: #1F2937;
 
-        width:100%;
+    color: white;
 
-    }
+    padding: 25px;
+
+    border-radius: 18px;
+
+    width: 240px;
+
+    min-height: 130px;
+
+    box-shadow: 
+        0 10px 25px rgba(0,0,0,0.35);
+
+    transition: 
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+    cursor: pointer;
+
+}
+
+
+.card:hover {
+
+    transform: translateY(-8px);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.5);
+
+}
+
+
+
+.card h4 {
+
+    color:#9CA3AF;
+
+    font-size:18px;
+
+    font-weight:500;
+
+}
+
+
+
+.card h1 {
+
+    margin-top:15px;
+
+    font-size:42px;
 
 }

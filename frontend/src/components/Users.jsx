@@ -1,44 +1,107 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../services/api";
-import "../styles/users.css";
 
-function Users() {
-  const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    async function fetchUsers() {
-      const data = await getUsers();
-      setUsers(data);
+function Users(){
+
+    const [users,setUsers] = useState([]);
+    const [loading,setLoading] = useState(true);
+
+
+    useEffect(()=>{
+
+        async function fetchUsers(){
+
+            try{
+
+                const data = await getUsers();
+                setUsers(data);
+
+            }
+            catch(error){
+
+                console.error("Error fetching users:",error);
+
+            }
+            finally{
+
+                setLoading(false);
+
+            }
+
+        }
+
+
+        fetchUsers();
+
+    },[]);
+
+
+
+    if(loading){
+
+        return(
+            <h2 style={{color:"white"}}>
+                Loading Users...
+            </h2>
+        )
+
     }
 
-    fetchUsers();
-  }, []);
 
-  return (
-    <div className="users-container">
-      <h2 className="users-title">Users</h2>
 
-      <table className="users-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-          </tr>
-        </thead>
+    return(
 
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+        <div
+        style={{
+            marginTop:"40px",
+            background:"#1F2937",
+            padding:"25px",
+            borderRadius:"20px"
+        }}
+        >
+
+            <h2
+            style={{
+                color:"white",
+                marginBottom:"20px"
+            }}
+            >
+                Users
+            </h2>
+
+
+            {
+                users.map((user)=>(
+
+                    <div
+                    key={user.id}
+                    style={{
+                        color:"white",
+                        padding:"15px",
+                        borderBottom:"1px solid #374151"
+                    }}
+                    >
+
+                        <h3>
+                            {user.username}
+                        </h3>
+
+                        <p style={{color:"#9CA3AF"}}>
+                            {user.email}
+                        </p>
+
+                    </div>
+
+                ))
+            }
+
+
+        </div>
+
+    );
+
 }
+
 
 export default Users;

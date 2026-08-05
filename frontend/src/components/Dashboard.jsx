@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "./Card";
 import { getDashboard } from "../services/api";
 import Users from "./Users";
+import Analytics from "./Analytics";
 
 function Dashboard() {
 
@@ -132,8 +133,12 @@ function Dashboard() {
 
       </div>
 
-
+      
+  <Analytics 
+   accuracy={dashboardData.accuracy}
+/>
       <Users />
+      
 
     </div>
 
