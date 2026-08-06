@@ -5,6 +5,7 @@ from app.db.database import Base, engine
 from app.models import User
 from app.api import dashboard, users
 from app.api import models
+from app.api.finance import router as finance_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(dashboard.router)
 app.include_router(users.router)
 app.include_router(models.router)
+app.include_router(finance_router)
 
 # Root endpoint
 @app.get("/")
