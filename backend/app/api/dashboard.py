@@ -1,10 +1,12 @@
 from fastapi import APIRouter
-from app.schemas.dashboard import DashboardResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/dashboard",
+    tags=["Dashboard"]
+)
 
 
-@router.get("/dashboard", response_model=DashboardResponse)
+@router.get("/")
 def get_dashboard():
 
     return {
@@ -13,3 +15,17 @@ def get_dashboard():
         "running_jobs": 8,
         "accuracy": 98.7
     }
+
+
+@router.get("/chart")
+def get_dashboard_chart():
+
+    return [
+        {"day": "Mon", "accuracy": 72},
+        {"day": "Tue", "accuracy": 78},
+        {"day": "Wed", "accuracy": 81},
+        {"day": "Thu", "accuracy": 86},
+        {"day": "Fri", "accuracy": 90},
+        {"day": "Sat", "accuracy": 95},
+        {"day": "Sun", "accuracy": 98},
+    ]

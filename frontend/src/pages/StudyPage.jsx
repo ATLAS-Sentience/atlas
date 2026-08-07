@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StudyChart from "../components/StudyChart";
 import "../styles/study.css";
+
+import {
+    getStudySessions,
+    addStudySession,
+    getStudyGoal,
+    createStudyGoal
+} from "../services/studyApi";
 
 
 function StudyPage(){
@@ -14,84 +21,78 @@ const [goalHours,setGoalHours]=useState("");
 const [goal,setGoal]=useState(null);
 
 const [sessions,setSessions]=useState([]);
+useEffect(() => {
+
+    async function loadData() {
+
+        const sessionData = await getStudySessions();
+        const goalData = await getStudyGoal();
+
+        setSessions(sessionData);
+
+        if (goalData) {
+            setGoal(goalData);
+        }
+    }
+
+    loadData();
+
+}, []);
 
 
 
-function addSession(){
+async function addSession() {
 
-if(!subject || !hours)
-return;
+    if (!subject || !hours) return;
 
+    const newSession = {
+        subject,
+        hours: Number(hours)
+    };
 
-const newSession={
+    await addStudySession(newSession);
 
-subject:subject,
+    const sessionData = await getStudySessions();
+    setSessions(sessionData);
 
-hours:Number(hours),
-
-date:new Date().toISOString().split("T")[0]
-
-};
-
-
-setSessions([
-...sessions,
-newSession
-]);
-
-
-setSubject("");
-setHours("");
-
+    setSubject("");
+    setHours("");
 }
 
 
 
 
-function addGoal(){
+async function addGoal() {
 
-if(!goalSubject || !goalHours)
-return;
+    if (!goalSubject || !goalHours) return;
 
+    const newGoal = {
+        subject: goalSubject,
+        target: Number(goalHours)
+    };
 
-setGoal({
+    await createStudyGoal(newGoal);
 
-subject:goalSubject,
+    const goalData = await getStudyGoal();
+    setGoal(goalData);
 
-target:Number(goalHours)
-
-});
-
-
-setGoalSubject("");
-setGoalHours("");
-
+    setGoalSubject("");
+    setGoalHours("");
 }
 
 
 
-
-const totalHours=sessions.reduce(
-
-(sum,item)=>sum+item.hours,
-
-0
-
+const totalHours = sessions.reduce(
+    (sum, item) => sum + Number(item.hours),
+    0
 );
 
-
-
-
-
-const subjects=[
-
-...new Set(
-
-sessions.map(item=>item.subject)
-
-)
-
+const subjects = [
+    ...new Set(
+        sessions.map(item => item.subject)
+    )
 ];
+
 
 
 
