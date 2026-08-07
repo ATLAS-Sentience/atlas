@@ -21,78 +21,112 @@ const [goalHours,setGoalHours]=useState("");
 const [goal,setGoal]=useState(null);
 
 const [sessions,setSessions]=useState([]);
-useEffect(() => {
 
-    async function loadData() {
+
+
+useEffect(()=>{
+
+    async function loadData(){
 
         const sessionData = await getStudySessions();
         const goalData = await getStudyGoal();
 
         setSessions(sessionData);
 
-        if (goalData) {
+        if(goalData){
             setGoal(goalData);
         }
+
     }
 
     loadData();
 
-}, []);
+},[]);
 
 
 
-async function addSession() {
 
-    if (!subject || !hours) return;
 
-    const newSession = {
+async function addSession(){
+
+    if(!subject || !hours) return;
+
+
+    const newSession={
+
         subject,
-        hours: Number(hours)
+        hours:Number(hours)
+
     };
+
 
     await addStudySession(newSession);
 
-    const sessionData = await getStudySessions();
-    setSessions(sessionData);
+
+    const data=await getStudySessions();
+
+    setSessions(data);
+
 
     setSubject("");
     setHours("");
+
 }
 
 
 
 
-async function addGoal() {
 
-    if (!goalSubject || !goalHours) return;
+async function addGoal(){
 
-    const newGoal = {
-        subject: goalSubject,
-        target: Number(goalHours)
+    if(!goalSubject || !goalHours) return;
+
+
+    const newGoal={
+
+        subject:goalSubject,
+        target:Number(goalHours)
+
     };
+
 
     await createStudyGoal(newGoal);
 
-    const goalData = await getStudyGoal();
-    setGoal(goalData);
+
+    const data=await getStudyGoal();
+
+    setGoal(data);
+
 
     setGoalSubject("");
     setGoalHours("");
+
 }
 
 
 
-const totalHours = sessions.reduce(
-    (sum, item) => sum + Number(item.hours),
-    0
+
+
+const totalHours=sessions.reduce(
+
+(sum,item)=>sum+Number(item.hours),
+
+0
+
 );
 
-const subjects = [
-    ...new Set(
-        sessions.map(item => item.subject)
-    )
-];
 
+
+
+const subjects=[
+
+...new Set(
+
+sessions.map(item=>item.subject)
+
+)
+
+];
 
 
 
@@ -102,13 +136,11 @@ function getSubjectHours(name){
 
 return sessions
 
-.filter(
-(item)=>item.subject===name
-)
+.filter(item=>item.subject===name)
 
 .reduce(
 
-(sum,item)=>sum+item.hours,
+(sum,item)=>sum+Number(item.hours),
 
 0
 
@@ -120,28 +152,23 @@ return sessions
 
 
 
-
 function calculateStreak(){
 
 if(sessions.length===0)
+
 return 0;
 
 
-let dates=sessions.map(
+const dates=sessions.map(
 
 item=>item.date
 
 );
 
 
-dates=[...new Set(dates)];
-
-
-return dates.length;
+return [...new Set(dates)].length;
 
 }
-
-
 
 
 
@@ -157,7 +184,9 @@ const completed=getSubjectHours(goal.subject);
 goalProgress=Math.min(
 
 Math.round(
+
 (completed/goal.target)*100
+
 ),
 
 100
@@ -166,42 +195,44 @@ Math.round(
 
 }
 
-const today = new Date()
+
+
+
+
+const today=new Date()
+
 .toISOString()
+
 .split("T")[0];
 
 
-const todayData = sessions
 
-.filter(
-(item)=>item.date===today
-)
 
-.map(
-(item)=>({
+
+const todayData=sessions
+
+.filter(item=>item.date===today)
+
+.map(item=>({
 
 day:item.subject,
 
 hours:item.hours
 
-})
-
-);
+}));
 
 
-return(
+
+
+
+
+return (
 
 <div>
 
 
 
-<h1
-style={{
-color:"white",
-textAlign:"center",
-fontSize:"50px"
-}}
->
+<h1 className="study-title">
 
 📚 Study Tracker
 
@@ -209,13 +240,7 @@ fontSize:"50px"
 
 
 
-<p
-style={{
-color:"#94A3B8",
-textAlign:"center",
-fontSize:"22px"
-}}
->
+<p className="study-subtitle">
 
 Build consistency with Atlas
 
@@ -228,15 +253,12 @@ Build consistency with Atlas
 <div className="stats-container">
 
 
+
 <div className="study-stat">
 
-<h3>
-Total Hours
-</h3>
+<h3>Total Hours</h3>
 
-<h1>
-{totalHours}
-</h1>
+<h1>{totalHours}</h1>
 
 </div>
 
@@ -245,29 +267,20 @@ Total Hours
 
 <div className="study-stat">
 
-<h3>
-Current Streak
-</h3>
+<h3>🔥 Streak</h3>
 
-<h1>
-🔥 {calculateStreak()} Days
-</h1>
+<h1>{calculateStreak()} Days</h1>
 
 </div>
 
 
 
 
-
 <div className="study-stat">
 
-<h3>
-Subjects
-</h3>
+<h3>Subjects</h3>
 
-<h1>
-{subjects.length}
-</h1>
+<h1>{subjects.length}</h1>
 
 </div>
 
@@ -285,9 +298,7 @@ Subjects
 <div className="study-card">
 
 
-<h2>
-Set Study Goal
-</h2>
+<h2>Set Study Goal</h2>
 
 
 <input
@@ -296,9 +307,7 @@ placeholder="Subject"
 
 value={goalSubject}
 
-onChange={(e)=>
-setGoalSubject(e.target.value)
-}
+onChange={(e)=>setGoalSubject(e.target.value)}
 
 />
 
@@ -310,9 +319,7 @@ placeholder="Target Hours"
 
 value={goalHours}
 
-onChange={(e)=>
-setGoalHours(e.target.value)
-}
+onChange={(e)=>setGoalHours(e.target.value)}
 
 />
 
@@ -335,6 +342,7 @@ Create Goal
 
 
 
+
 {
 
 goal &&
@@ -342,41 +350,30 @@ goal &&
 <div className="study-card">
 
 
-<h2>
-Today's Goal
-</h2>
+<h2>Today's Goal</h2>
 
 
-<h3>
-
-{goal.subject}
-
-</h3>
+<h3>{goal.subject}</h3>
 
 
 <p>
 
-Target:
-{goal.target} hours
+Target: {goal.target} hours
 
 </p>
-
 
 
 <p>
 
 Completed:
 
-{getSubjectHours(goal.subject)}
-
-hours
+{getSubjectHours(goal.subject)} hours
 
 </p>
 
 
 
 <div className="progress-bar">
-
 
 <div
 
@@ -392,22 +389,21 @@ width:`${goalProgress}%`
 
 </div>
 
-
 </div>
 
 
 
-<h3>
-
-{goalProgress}% Completed
-
-</h3>
+<h3>{goalProgress}% Completed</h3>
 
 
 
 </div>
 
 }
+
+
+
+
 
 
 
@@ -416,10 +412,7 @@ width:`${goalProgress}%`
 <div className="study-card">
 
 
-<h2>
-Add Study Session
-</h2>
-
+<h2>Add Study Session</h2>
 
 
 <input
@@ -428,9 +421,7 @@ placeholder="Subject"
 
 value={subject}
 
-onChange={(e)=>
-setSubject(e.target.value)
-}
+onChange={(e)=>setSubject(e.target.value)}
 
 />
 
@@ -442,9 +433,7 @@ placeholder="Hours"
 
 value={hours}
 
-onChange={(e)=>
-setHours(e.target.value)
-}
+onChange={(e)=>setHours(e.target.value)}
 
 />
 
@@ -457,6 +446,7 @@ Add Session
 </button>
 
 
+
 </div>
 
 
@@ -470,21 +460,28 @@ Add Session
 <div className="study-card">
 
 
-<h2>
-Subject Progress
-</h2>
+<h2>Subject Progress</h2>
 
 
 
 {
 
-subjects.map((sub,index)=>{
+subjects.length===0 &&
+
+<p className="empty">
+
+No subjects yet 🚀
+
+</p>
+
+}
 
 
-let hrs=getSubjectHours(sub);
 
+{
 
-return(
+subjects.map((sub,index)=>(
+
 
 <div
 
@@ -495,16 +492,12 @@ key={index}
 >
 
 
-<div>
-
-<h3>
-{sub}
-</h3>
+<h3>{sub}</h3>
 
 
 <p>
 
-{hrs} Hours
+{getSubjectHours(sub)} Hours
 
 </p>
 
@@ -512,14 +505,7 @@ key={index}
 </div>
 
 
-
-</div>
-
-
-)
-
-})
-
+))
 
 }
 
@@ -534,12 +520,28 @@ key={index}
 
 
 
+
 <div className="study-card">
 
 
-<h2>
-Study History
-</h2>
+<h2>Study History</h2>
+
+
+
+{
+
+sessions.length===0 &&
+
+<p className="empty">
+
+No study sessions yet. Start learning 🚀
+
+</p>
+
+}
+
+
+
 
 
 {
@@ -573,7 +575,6 @@ key={index}
 </div>
 
 
-
 ))
 
 }
@@ -588,16 +589,12 @@ key={index}
 
 
 
-<StudyChart
-data={todayData}
-/>
 
-
+<StudyChart data={todayData}/>
 
 
 
 </div>
-
 
 )
 
