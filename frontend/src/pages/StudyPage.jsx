@@ -6,7 +6,8 @@ import {
     getStudySessions,
     addStudySession,
     getStudyGoal,
-    createStudyGoal
+    createStudyGoal,
+    getStudyAnalytics
 } from "../services/studyApi";
 
 
@@ -22,6 +23,12 @@ const [goal,setGoal]=useState(null);
 
 const [sessions,setSessions]=useState([]);
 
+const [analytics,setAnalytics]=useState({
+    total_hours:0,
+    subjects:0,
+    streak:0
+});
+
 
 
 useEffect(()=>{
@@ -29,9 +36,16 @@ useEffect(()=>{
     async function loadData(){
 
         const sessionData = await getStudySessions();
+
         const goalData = await getStudyGoal();
 
+        const analyticsData = await getStudyAnalytics();
+
+
         setSessions(sessionData);
+
+        setAnalytics(analyticsData);
+
 
         if(goalData){
             setGoal(goalData);
@@ -39,7 +53,9 @@ useEffect(()=>{
 
     }
 
+
     loadData();
+
 
 },[]);
 
@@ -49,26 +65,31 @@ useEffect(()=>{
 
 async function addSession(){
 
-    if(!subject || !hours) return;
+    if(!subject || !hours)
+        return;
 
 
     const newSession={
-
         subject,
         hours:Number(hours)
-
     };
 
 
     await addStudySession(newSession);
 
 
-    const data=await getStudySessions();
+    const sessionData = await getStudySessions();
 
-    setSessions(data);
+    const analyticsData = await getStudyAnalytics();
+
+
+    setSessions(sessionData);
+
+    setAnalytics(analyticsData);
 
 
     setSubject("");
+
     setHours("");
 
 }
@@ -79,12 +100,14 @@ async function addSession(){
 
 async function addGoal(){
 
-    if(!goalSubject || !goalHours) return;
+    if(!goalSubject || !goalHours)
+        return;
 
 
     const newGoal={
 
         subject:goalSubject,
+
         target:Number(goalHours)
 
     };
@@ -93,12 +116,14 @@ async function addGoal(){
     await createStudyGoal(newGoal);
 
 
-    const data=await getStudyGoal();
+    const goalData = await getStudyGoal();
 
-    setGoal(data);
+
+    setGoal(goalData);
 
 
     setGoalSubject("");
+
     setGoalHours("");
 
 }
@@ -107,68 +132,37 @@ async function addGoal(){
 
 
 
-const totalHours=sessions.reduce(
+function getSubjectHours(name){
 
-(sum,item)=>sum+Number(item.hours),
+    return sessions
 
-0
+    .filter(
+        item=>item.subject===name
+    )
 
-);
+    .reduce(
+        (sum,item)=>sum+Number(item.hours),
+        0
+    );
+
+}
+
 
 
 
 
 const subjects=[
 
-...new Set(
+    ...new Set(
 
-sessions.map(item=>item.subject)
+        sessions.map(
+            item=>item.subject
+        )
 
-)
+    )
 
 ];
 
-
-
-
-
-function getSubjectHours(name){
-
-return sessions
-
-.filter(item=>item.subject===name)
-
-.reduce(
-
-(sum,item)=>sum+Number(item.hours),
-
-0
-
-);
-
-}
-
-
-
-
-
-function calculateStreak(){
-
-if(sessions.length===0)
-
-return 0;
-
-
-const dates=sessions.map(
-
-item=>item.date
-
-);
-
-
-return [...new Set(dates)].length;
-
-}
 
 
 
@@ -178,20 +172,18 @@ let goalProgress=0;
 
 if(goal){
 
-const completed=getSubjectHours(goal.subject);
+    const completed=getSubjectHours(goal.subject);
 
 
-goalProgress=Math.min(
+    goalProgress=Math.min(
 
-Math.round(
+        Math.round(
+            (completed/goal.target)*100
+        ),
 
-(completed/goal.target)*100
+        100
 
-),
-
-100
-
-);
+    );
 
 }
 
@@ -199,7 +191,7 @@ Math.round(
 
 
 
-const today=new Date()
+const today = new Date()
 
 .toISOString()
 
@@ -209,38 +201,55 @@ const today=new Date()
 
 
 
-const todayData=sessions
+const todayData = sessions
 
-.filter(item=>item.date===today)
+.filter(
+    item=>item.date===today
+)
 
-.map(item=>({
+.map(
 
-day:item.subject,
+item=>({
 
-hours:item.hours
+    day:item.subject,
 
-}));
+    hours:item.hours
+
+})
+
+);
 
 
 
 
 
 
-return (
+
+return(
 
 <div>
 
 
-
-<h1 className="study-title">
+<h1
+style={{
+color:"white",
+textAlign:"center",
+fontSize:"50px"
+}}
+>
 
 📚 Study Tracker
 
 </h1>
 
 
-
-<p className="study-subtitle">
+<p
+style={{
+color:"#94A3B8",
+textAlign:"center",
+fontSize:"22px"
+}}
+>
 
 Build consistency with Atlas
 
@@ -253,34 +262,47 @@ Build consistency with Atlas
 <div className="stats-container">
 
 
-
 <div className="study-stat">
 
-<h3>Total Hours</h3>
+<h3>
+Total Hours
+</h3>
 
-<h1>{totalHours}</h1>
+<h1>
+{analytics.total_hours}
+</h1>
 
 </div>
 
 
 
 
+
 <div className="study-stat">
 
-<h3>🔥 Streak</h3>
+<h3>
+Current Streak
+</h3>
 
-<h1>{calculateStreak()} Days</h1>
+<h1>
+🔥 {analytics.streak} Days
+</h1>
 
 </div>
 
 
 
 
+
 <div className="study-stat">
 
-<h3>Subjects</h3>
+<h3>
+Subjects
+</h3>
 
-<h1>{subjects.length}</h1>
+<h1>
+{analytics.subjects}
+</h1>
 
 </div>
 
@@ -298,7 +320,10 @@ Build consistency with Atlas
 <div className="study-card">
 
 
-<h2>Set Study Goal</h2>
+<h2>
+Set Study Goal
+</h2>
+
 
 
 <input
@@ -307,7 +332,9 @@ placeholder="Subject"
 
 value={goalSubject}
 
-onChange={(e)=>setGoalSubject(e.target.value)}
+onChange={(e)=>
+setGoalSubject(e.target.value)
+}
 
 />
 
@@ -319,7 +346,9 @@ placeholder="Target Hours"
 
 value={goalHours}
 
-onChange={(e)=>setGoalHours(e.target.value)}
+onChange={(e)=>
+setGoalHours(e.target.value)
+}
 
 />
 
@@ -341,59 +370,55 @@ Create Goal
 
 
 
-
-
 {
-
 goal &&
 
 <div className="study-card">
 
 
-<h2>Today's Goal</h2>
+<h2>
+Today's Goal
+</h2>
 
 
-<h3>{goal.subject}</h3>
+<h3>
+{goal.subject}
+</h3>
 
 
 <p>
-
 Target: {goal.target} hours
-
 </p>
 
 
 <p>
-
-Completed:
-
-{getSubjectHours(goal.subject)} hours
-
+Completed: {getSubjectHours(goal.subject)} hours
 </p>
 
 
 
 <div className="progress-bar">
 
+
 <div
 
 className="progress-fill"
 
 style={{
-
 width:`${goalProgress}%`
-
 }}
 
 >
 
 </div>
 
+
 </div>
 
 
-
-<h3>{goalProgress}% Completed</h3>
+<h3>
+{goalProgress}% Completed
+</h3>
 
 
 
@@ -412,7 +437,11 @@ width:`${goalProgress}%`
 <div className="study-card">
 
 
-<h2>Add Study Session</h2>
+<h2>
+Add Study Session
+</h2>
+
+
 
 
 <input
@@ -421,9 +450,12 @@ placeholder="Subject"
 
 value={subject}
 
-onChange={(e)=>setSubject(e.target.value)}
+onChange={(e)=>
+setSubject(e.target.value)
+}
 
 />
+
 
 
 
@@ -433,7 +465,9 @@ placeholder="Hours"
 
 value={hours}
 
-onChange={(e)=>setHours(e.target.value)}
+onChange={(e)=>
+setHours(e.target.value)
+}
 
 />
 
@@ -446,7 +480,6 @@ Add Session
 </button>
 
 
-
 </div>
 
 
@@ -460,52 +493,105 @@ Add Session
 <div className="study-card">
 
 
-<h2>Subject Progress</h2>
+<h2>
+Subject Progress
+</h2>
 
 
 
 {
 
-subjects.length===0 &&
+subjects.length===0 && (
 
-<p className="empty">
-
+<p>
 No subjects yet 🚀
-
 </p>
+
+)
 
 }
 
 
 
+
 {
 
-subjects.map((sub,index)=>(
+subjects.map((sub,index)=>{
 
+
+const hrs=getSubjectHours(sub);
+
+
+
+return(
 
 <div
 
-className="study-item"
+className="subject-progress"
 
 key={index}
 
 >
 
 
-<h3>{sub}</h3>
+<div
+
+style={{
+
+display:"flex",
+
+justifyContent:"space-between"
+
+}}
+
+>
+
+
+<h3>
+{sub}
+</h3>
 
 
 <p>
-
-{getSubjectHours(sub)} Hours
-
+{hrs} hrs
 </p>
 
 
 </div>
 
 
-))
+
+
+<div className="progress-bar">
+
+
+<div
+
+className="progress-fill"
+
+style={{
+
+width:`${Math.min(hrs*10,100)}%`
+
+}}
+
+>
+
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+)
+
+
+})
 
 }
 
@@ -524,7 +610,9 @@ key={index}
 <div className="study-card">
 
 
-<h2>Study History</h2>
+<h2>
+Study History
+</h2>
 
 
 
@@ -532,10 +620,8 @@ key={index}
 
 sessions.length===0 &&
 
-<p className="empty">
-
-No study sessions yet. Start learning 🚀
-
+<p>
+No study sessions yet 🚀
 </p>
 
 }
@@ -559,20 +645,18 @@ key={index}
 
 
 <h3>
-
 {item.subject}
-
 </h3>
 
 
 <p>
-
 {item.hours} hrs
-
 </p>
 
 
+
 </div>
+
 
 
 ))
@@ -589,8 +673,13 @@ key={index}
 
 
 
+<StudyChart
 
-<StudyChart data={todayData}/>
+data={todayData}
+
+/>
+
+
 
 
 
@@ -599,6 +688,7 @@ key={index}
 )
 
 }
+
 
 
 export default StudyPage;

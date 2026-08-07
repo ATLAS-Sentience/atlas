@@ -29,7 +29,7 @@ color:"white",
 textAlign:"center"
 }}
 >
-Weekly Study Hours
+Study Hours
 </h2>
 
 

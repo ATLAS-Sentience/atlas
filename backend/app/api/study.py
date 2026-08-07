@@ -17,10 +17,14 @@ from app.services.study import (
     create_goal
 )
 
+from app.models.study import StudySession
+
+
 router = APIRouter(
     prefix="/study",
     tags=["Study"]
 )
+
 
 
 @router.get(
@@ -29,6 +33,7 @@ router = APIRouter(
 )
 def read_sessions(db: Session = Depends(get_db)):
     return get_sessions(db)
+
 
 
 @router.post(
@@ -42,12 +47,14 @@ def add_session(
     return create_session(db, session)
 
 
+
 @router.get(
     "/goal",
     response_model=StudyGoalResponse | None
 )
 def read_goal(db: Session = Depends(get_db)):
     return get_goal(db)
+
 
 
 @router.post(
@@ -59,3 +66,49 @@ def add_goal(
     db: Session = Depends(get_db)
 ):
     return create_goal(db, goal)
+
+
+
+# -----------------------------
+# Study Analytics
+# -----------------------------
+
+@router.get("/analytics")
+def study_analytics(
+    db: Session = Depends(get_db)
+):
+
+    sessions = db.query(StudySession).all()
+
+
+    total_hours = sum(
+        session.hours
+        for session in sessions
+    )
+
+
+    subjects = list(
+        set(
+            session.subject
+            for session in sessions
+        )
+    )
+
+
+    dates = list(
+        set(
+            session.date
+            for session in sessions
+        )
+    )
+
+
+    return {
+
+        "total_hours": total_hours,
+
+        "subjects": len(subjects),
+
+        "streak": len(dates)
+
+    }
