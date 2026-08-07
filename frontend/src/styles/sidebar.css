@@ -1,0 +1,36 @@
+.sidebar{
+
+    width:260px;
+    min-width:260px;
+
+    min-height:calc(100vh - 70px);
+
+    background:#1E293B;
+    color:white;
+
+    padding:30px 20px;
+
+    flex-shrink:0;
+
+}
+
+
+.sidebar h3{
+
+    margin-bottom:40px;
+
+}
+
+
+.sidebar a{
+
+    display:block;
+
+    color:white;
+    text-decoration:none;
+
+    font-size:20px;
+
+    margin-bottom:30px;
+
+}
