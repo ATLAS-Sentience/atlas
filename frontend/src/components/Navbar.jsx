@@ -1,32 +1,96 @@
+import { useEffect, useState } from "react";
 import "../styles/navbar.css";
 
 import { FiMenu } from "react-icons/fi";
 
-function Navbar({ sidebarOpen, setSidebarOpen }) {
 
-    return (
+function Navbar({ sidebarOpen, setSidebarOpen }){
 
-        <nav className="navbar">
 
-            <button
-                className="menu-button"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-                <FiMenu />
-            </button>
+const [username,setUsername]=useState(
+    localStorage.getItem("username") || "User"
+);
 
-            <h2 className="logo">
-                ATLAS
-            </h2>
 
-            <div className="user">
-                👤 User
-            </div>
 
-        </nav>
+useEffect(()=>{
 
+
+function updateUser(){
+
+    setUsername(
+        localStorage.getItem("username") || "User"
     );
 
 }
+
+
+window.addEventListener(
+    "profileUpdated",
+    updateUser
+);
+
+
+return()=>{
+
+window.removeEventListener(
+    "profileUpdated",
+    updateUser
+);
+
+};
+
+
+},[]);
+
+
+
+
+
+return(
+
+<nav className="navbar">
+
+
+<button
+
+className="menu-button"
+
+onClick={()=>setSidebarOpen(!sidebarOpen)}
+
+>
+
+<FiMenu />
+
+</button>
+
+
+
+
+<h2 className="logo">
+
+ATLAS
+
+</h2>
+
+
+
+
+<div className="user">
+
+👤 {username}
+
+</div>
+
+
+
+
+</nav>
+
+
+)
+
+}
+
 
 export default Navbar;

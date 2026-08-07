@@ -5,59 +5,63 @@ import "../styles/settings.css";
 function SettingsPage(){
 
 
+const [username,setUsername]=useState(
+    localStorage.getItem("username") || "Atlas User"
+);
+
+
+const [email,setEmail]=useState(
+    localStorage.getItem("email") || "user@example.com"
+);
+
+
 const [darkMode,setDarkMode]=useState(true);
 
-const [notifications,setNotifications]=useState({
+const [studyReminder,setStudyReminder]=useState(true);
 
-study:true,
-tasks:true,
-focus:true,
-reports:false
-
-});
+const [taskAlert,setTaskAlert]=useState(true);
 
 
-const [focusTime,setFocusTime]=useState(25);
 
 
-function toggleNotification(type){
 
-setNotifications({
+function saveProfile(){
 
-...notifications,
+    localStorage.setItem(
+        "username",
+        username
+    );
 
-[type]:!notifications[type]
 
-});
+    localStorage.setItem(
+        "email",
+        email
+    );
+
+
+    window.dispatchEvent(
+        new Event("profileUpdated")
+    );
 
 }
 
 
 
+
+
 return(
 
-<div>
+<div className="settings-container">
 
 
-<h1 className="settings-title">
-
+<h1>
 ⚙️ Settings
-
 </h1>
 
 
 <p className="settings-subtitle">
-
 Customize your Atlas experience
-
 </p>
-
-
-
-
-
-
-<div className="settings-container">
 
 
 
@@ -71,36 +75,62 @@ Customize your Atlas experience
 </h2>
 
 
+
+
+<div className="setting-item">
+
+<p>
+Username
+</p>
+
+
 <input
 
-placeholder="Name"
+value={username}
+
+onChange={(e)=>setUsername(e.target.value)}
 
 />
+
+</div>
+
+
+
+
+
+<div className="setting-item">
+
+<p>
+Email
+</p>
 
 
 <input
 
-placeholder="Email"
+value={email}
+
+onChange={(e)=>setEmail(e.target.value)}
 
 />
 
-
-<textarea
-
-placeholder="Bio"
-
-/>
+</div>
 
 
 
-<button>
+
+<button
+onClick={saveProfile}
+>
 
 Save Profile
 
 </button>
 
 
+
 </div>
+
+
 
 
 
@@ -117,11 +147,13 @@ Save Profile
 
 
 
-<div className="setting-row">
+<div className="setting-item">
+
 
 <p>
 Dark Mode
 </p>
+
 
 
 <button
@@ -136,11 +168,11 @@ darkMode
 
 ?
 
-"ON"
+"Enabled"
 
 :
 
-"OFF"
+"Disabled"
 
 }
 
@@ -151,37 +183,8 @@ darkMode
 
 
 
-<div className="setting-row">
-
-
-<p>
-Accent Color
-</p>
-
-
-<select>
-
-<option>
-Blue
-</option>
-
-<option>
-Purple
-</option>
-
-<option>
-Green
-</option>
-
-
-</select>
-
-
 </div>
 
-
-
-</div>
 
 
 
@@ -200,151 +203,73 @@ Green
 
 
 
-<div className="setting-row">
+<div className="setting-item">
 
 <p>
 Study Reminders
 </p>
 
 
-<input
+<button
 
-type="checkbox"
+onClick={()=>setStudyReminder(!studyReminder)}
 
-checked={notifications.study}
+>
 
-onChange={()=>toggleNotification("study")}
+{
 
-/>
+studyReminder
 
+?
 
-</div>
+"ON"
 
+:
 
+"OFF"
 
-
-
-<div className="setting-row">
-
-<p>
-Task Reminders
-</p>
-
-
-<input
-
-type="checkbox"
-
-checked={notifications.tasks}
-
-onChange={()=>toggleNotification("tasks")}
-
-/>
-
-
-</div>
-
-
-
-
-
-
-<div className="setting-row">
-
-<p>
-Focus Alerts
-</p>
-
-
-<input
-
-type="checkbox"
-
-checked={notifications.focus}
-
-onChange={()=>toggleNotification("focus")}
-
-/>
-
-
-</div>
-
-
-
-
-
-
-<div className="setting-row">
-
-<p>
-Weekly Reports
-</p>
-
-
-<input
-
-type="checkbox"
-
-checked={notifications.reports}
-
-onChange={()=>toggleNotification("reports")}
-
-/>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-<div className="settings-card">
-
-
-<h2>
-⚡ Productivity Preferences
-</h2>
-
-
-
-<label>
-
-Default Focus Time
-
-</label>
-
-
-
-<input
-
-type="number"
-
-value={focusTime}
-
-onChange={(e)=>
-setFocusTime(e.target.value)
 }
 
-/>
+</button>
 
 
+</div>
+
+
+
+
+
+<div className="setting-item">
 
 <p>
-
-Current:
-
-{focusTime} minutes
-
+Task Alerts
 </p>
+
+
+<button
+
+onClick={()=>setTaskAlert(!taskAlert)}
+
+>
+
+{
+
+taskAlert
+
+?
+
+"ON"
+
+:
+
+"OFF"
+
+}
+
+</button>
+
+
+</div>
 
 
 
@@ -362,36 +287,26 @@ Current:
 
 
 <h2>
-🔒 Security
-
+🗂 Data Management
 </h2>
 
 
-<button>
 
-Change Password
+<button className="danger-btn">
 
-</button>
-
-
-<button>
-
-Logout
+Clear Local Data
 
 </button>
 
 
-</div>
-
-
-
-
-
 
 </div>
 
 
+
+
 </div>
+
 
 )
 

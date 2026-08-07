@@ -1,28 +1,32 @@
-.settings-title{
+.settings-container{
+
+padding:40px;
 
 color:white;
+
+}
+
+
+
+.settings-container h1{
+
 text-align:center;
+
 font-size:50px;
 
 }
 
 
+
 .settings-subtitle{
 
 text-align:center;
+
 color:#94A3B8;
+
 font-size:22px;
 
-}
-
-
-
-.settings-container{
-
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:25px;
+margin-bottom:40px;
 
 }
 
@@ -32,87 +36,27 @@ gap:25px;
 
 background:#1E293B;
 
-color:white;
-
 padding:30px;
 
 border-radius:20px;
 
 width:600px;
 
-transition:.3s;
+margin:30px auto;
 
 }
 
 
 
-.settings-card:hover{
+.settings-card h2{
 
-transform:translateY(-5px);
-
-}
-
-
-
-.settings-card input,
-.settings-card textarea,
-.settings-card select{
-
-width:100%;
-
-padding:15px;
-
-margin-top:15px;
-
-background:#334155;
-
-border:none;
-
-border-radius:10px;
-
-color:white;
-
-font-size:16px;
+margin-bottom:20px;
 
 }
 
 
 
-.settings-card textarea{
-
-height:100px;
-
-}
-
-
-
-.settings-card button{
-
-margin-top:15px;
-
-padding:12px 20px;
-
-background:#3B82F6;
-
-border:none;
-
-border-radius:10px;
-
-color:white;
-
-cursor:pointer;
-
-}
-
-
-
-.setting-row{
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
+.setting-item{
 
 background:#334155;
 
@@ -122,16 +66,46 @@ border-radius:12px;
 
 margin-top:15px;
 
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+
+
+.setting-item button{
+
+background:#3B82F6;
+
+color:white;
+
+border:none;
+
+padding:10px 20px;
+
+border-radius:10px;
+
 }
 
 
 
-@media(max-width:700px){
+.danger-btn{
 
-.settings-card{
+width:100%;
 
-width:90%;
+padding:15px;
 
-}
+background:#EF4444;
+
+color:white;
+
+border:none;
+
+border-radius:12px;
+
+font-size:18px;
 
 }
