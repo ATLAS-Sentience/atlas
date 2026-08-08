@@ -8,6 +8,10 @@ from app.schemas.user import UserResponse, UserUpdate
 
 router = APIRouter()
 
+@router.get("/users", response_model=list[UserResponse])
+def get_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
+
 
 @router.get("/users/profile", response_model=UserResponse)
 def get_profile(db: Session = Depends(get_db)):
