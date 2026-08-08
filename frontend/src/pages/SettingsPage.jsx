@@ -12,10 +12,17 @@ function SettingsPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
 
-    const [darkMode, setDarkMode] = useState(true);
-    const [studyReminder, setStudyReminder] = useState(true);
-    const [taskAlert, setTaskAlert] = useState(true);
+    const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("darkMode") !== "false"
+);
 
+const [studyReminder, setStudyReminder] = useState(
+    localStorage.getItem("studyReminder") !== "false"
+);
+
+const [taskAlert, setTaskAlert] = useState(
+    localStorage.getItem("taskAlert") !== "false"
+);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -55,6 +62,14 @@ function SettingsPage() {
         loadProfile();
 
     }, []);
+
+    useEffect(() => {
+    localStorage.setItem("darkMode", darkMode);
+    localStorage.setItem("studyReminder", studyReminder);
+    localStorage.setItem("taskAlert", taskAlert);
+
+    document.body.classList.toggle("dark-mode", darkMode);
+}, [darkMode, studyReminder, taskAlert]);
 
 
     async function saveProfile() {
