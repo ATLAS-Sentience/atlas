@@ -11,307 +11,297 @@ import {
 } from "../services/studyApi";
 
 
-function StudyPage(){
-
-const [subject,setSubject]=useState("");
-const [hours,setHours]=useState("");
-
-const [goalSubject,setGoalSubject]=useState("");
-const [goalHours,setGoalHours]=useState("");
-
-const [goal,setGoal]=useState(null);
-
-const [sessions,setSessions]=useState([]);
-
-const [analytics,setAnalytics]=useState({
-    total_hours:0,
-    subjects:0,
-    streak:0
-});
+function StudyPage() {
 
 
+    const [subject, setSubject] = useState("");
+    const [hours, setHours] = useState("");
 
-useEffect(()=>{
+    const [goalSubject, setGoalSubject] = useState("");
+    const [goalHours, setGoalHours] = useState("");
 
-    async function loadData(){
+    const [goal, setGoal] = useState(null);
 
-        const sessionData = await getStudySessions();
-
-        const goalData = await getStudyGoal();
-
-        const analyticsData = await getStudyAnalytics();
-
-
-        setSessions(sessionData);
-
-        setAnalytics(analyticsData);
+    const [sessions, setSessions] = useState([]);
 
 
-        if(goalData){
-            setGoal(goalData);
+    const [analytics, setAnalytics] = useState({
+        total_hours: 0,
+        subjects: 0,
+        streak: 0
+    });
+
+
+
+    useEffect(() => {
+
+        async function loadData() {
+
+            try {
+
+                const sessionData =
+                    await getStudySessions();
+
+
+                const goalData =
+                    await getStudyGoal();
+
+
+                const analyticsData =
+                    await getStudyAnalytics();
+
+
+
+                setSessions(
+                    sessionData || []
+                );
+
+
+                setGoal(
+                    goalData || null
+                );
+
+
+                setAnalytics(
+                    analyticsData || {
+                        total_hours:0,
+                        subjects:0,
+                        streak:0
+                    }
+                );
+
+
+            } catch(error){
+
+                console.error(
+                    "Failed loading study data",
+                    error
+                );
+
+            }
+
         }
+
+
+        loadData();
+
+
+    }, []);
+
+
+
+
+
+    async function addSession(){
+
+
+        if(!subject.trim() || !hours)
+            return;
+
+
+
+        const newSession = {
+
+            subject,
+
+            hours:Number(hours)
+
+        };
+
+
+
+        await addStudySession(
+            newSession
+        );
+
+
+
+        const updatedSessions =
+            await getStudySessions();
+
+
+        const updatedAnalytics =
+            await getStudyAnalytics();
+
+
+
+        setSessions(
+            updatedSessions || []
+        );
+
+
+        setAnalytics(
+            updatedAnalytics || {
+                total_hours:0,
+                subjects:0,
+                streak:0
+            }
+        );
+
+
+
+        setSubject("");
+
+        setHours("");
 
     }
 
 
-    loadData();
-
-
-},[]);
 
 
 
+    async function addGoal(){
 
 
-async function addSession(){
-
-    if(!subject || !hours)
-        return;
-
-
-    const newSession={
-        subject,
-        hours:Number(hours)
-    };
-
-
-    await addStudySession(newSession);
-
-
-    const sessionData = await getStudySessions();
-
-    const analyticsData = await getStudyAnalytics();
-
-
-    setSessions(sessionData);
-
-    setAnalytics(analyticsData);
-
-
-    setSubject("");
-
-    setHours("");
-
-}
+        if(!goalSubject.trim() || !goalHours)
+            return;
 
 
 
+        const newGoal = {
+
+            subject:goalSubject,
+
+            target:Number(goalHours)
+
+        };
 
 
-async function addGoal(){
 
-    if(!goalSubject || !goalHours)
-        return;
-
-
-    const newGoal={
-
-        subject:goalSubject,
-
-        target:Number(goalHours)
-
-    };
+        await createStudyGoal(
+            newGoal
+        );
 
 
-    await createStudyGoal(newGoal);
+
+        const goalData =
+            await getStudyGoal();
 
 
-    const goalData = await getStudyGoal();
+
+        setGoal(
+            goalData || null
+        );
 
 
-    setGoal(goalData);
 
+        setGoalSubject("");
 
-    setGoalSubject("");
+        setGoalHours("");
 
-    setGoalHours("");
-
-}
+    }
 
 
 
 
 
-function getSubjectHours(name){
-
-    return sessions
-
-    .filter(
-        item=>item.subject===name
-    )
-
-    .reduce(
-        (sum,item)=>sum+Number(item.hours),
-        0
-    );
-
-}
+    function getSubjectHours(name){
 
 
+        return sessions
+
+            .filter(
+                item =>
+                item.subject === name
+            )
+
+            .reduce(
+                (sum,item)=>
+                sum + Number(item.hours),
+                0
+            );
+
+    }
 
 
 
-const subjects=[
 
-    ...new Set(
 
-        sessions.map(
-            item=>item.subject
+    const subjects = [
+
+        ...new Set(
+            sessions.map(
+                item=>item.subject
+            )
         )
 
-    )
-
-];
+    ];
 
 
 
 
 
-let goalProgress=0;
+    let goalProgress = 0;
 
 
-if(goal){
-
-    const completed=getSubjectHours(goal.subject);
+    if(goal){
 
 
-    goalProgress=Math.min(
-
-        Math.round(
-            (completed/goal.target)*100
-        ),
-
-        100
-
-    );
-
-}
+        const completed =
+            getSubjectHours(
+                goal.subject
+            );
 
 
 
+        goalProgress =
+            Math.min(
+                Math.round(
+                    (completed / goal.target) * 100
+                ),
+                100
+            );
 
-
-const today = new Date()
-
-.toISOString()
-
-.split("T")[0];
+    }
 
 
 
 
 
-const todayData = sessions
+    const today =
+        new Date()
+        .toISOString()
+        .split("T")[0];
 
-.filter(
-    item=>item.date===today
-)
 
-.map(
 
-item=>({
+    const todayData =
 
-    day:item.subject,
+        sessions
 
-    hours:item.hours
+        .filter(
+            item =>
+            item.date === today
+        )
 
-})
+        .map(
+            item => ({
 
-);
+                day:item.subject,
 
+                hours:item.hours
+
+            })
+        );
 
 
 
 
 
 
-return(
+return (
 
-<div>
+<div className="study-container">
 
 
-<h1
-style={{
-color:"white",
-textAlign:"center",
-fontSize:"50px"
-}}
->
-
+<h1>
 📚 Study Tracker
-
 </h1>
 
 
-<p
-style={{
-color:"#94A3B8",
-textAlign:"center",
-fontSize:"22px"
-}}
->
-
+<p className="study-subtitle">
 Build consistency with Atlas
-
 </p>
-
-
-
-
-
-<div className="stats-container">
-
-
-<div className="study-stat">
-
-<h3>
-Total Hours
-</h3>
-
-<h1>
-{analytics.total_hours}
-</h1>
-
-</div>
-
-
-
-
-
-<div className="study-stat">
-
-<h3>
-Current Streak
-</h3>
-
-<h1>
-🔥 {analytics.streak} Days
-</h1>
-
-</div>
-
-
-
-
-
-<div className="study-stat">
-
-<h3>
-Subjects
-</h3>
-
-<h1>
-{analytics.subjects}
-</h1>
-
-</div>
-
-
-
-</div>
-
-
-
 
 
 
@@ -332,7 +322,8 @@ placeholder="Subject"
 
 value={goalSubject}
 
-onChange={(e)=>
+onChange={
+(e)=>
 setGoalSubject(e.target.value)
 }
 
@@ -344,9 +335,12 @@ setGoalSubject(e.target.value)
 
 placeholder="Target Hours"
 
+type="number"
+
 value={goalHours}
 
-onChange={(e)=>
+onChange={
+(e)=>
 setGoalHours(e.target.value)
 }
 
@@ -362,28 +356,19 @@ Create Goal
 
 
 
-</div>
-
-
-
-
-
-
-
 {
-goal &&
+goal && (
 
-<div className="study-card">
-
-
-<h2>
-Today's Goal
-</h2>
-
+<div>
 
 <h3>
-{goal.subject}
+Today's Goal
 </h3>
+
+
+<p>
+{goal.subject}
+</p>
 
 
 <p>
@@ -392,13 +377,16 @@ Target: {goal.target} hours
 
 
 <p>
-Completed: {getSubjectHours(goal.subject)} hours
+Completed:
+{
+getSubjectHours(goal.subject)
+}
+hours
 </p>
 
 
 
 <div className="progress-bar">
-
 
 <div
 
@@ -408,26 +396,26 @@ style={{
 width:`${goalProgress}%`
 }}
 
->
-
-</div>
+></div>
 
 
 </div>
 
 
-<h3>
+<p>
 {goalProgress}% Completed
-</h3>
-
+</p>
 
 
 </div>
+
+)
 
 }
 
 
 
+</div>
 
 
 
@@ -443,14 +431,14 @@ Add Study Session
 
 
 
-
 <input
 
 placeholder="Subject"
 
 value={subject}
 
-onChange={(e)=>
+onChange={
+(e)=>
 setSubject(e.target.value)
 }
 
@@ -458,14 +446,16 @@ setSubject(e.target.value)
 
 
 
-
 <input
 
 placeholder="Hours"
 
+type="number"
+
 value={hours}
 
-onChange={(e)=>
+onChange={
+(e)=>
 setHours(e.target.value)
 }
 
@@ -480,8 +470,50 @@ Add Session
 </button>
 
 
+
 </div>
 
+
+
+
+
+
+
+<div className="study-card">
+
+
+<h2>
+Analytics
+</h2>
+
+
+<p>
+Total Hours:
+{
+analytics?.total_hours || 0
+}
+</p>
+
+
+<p>
+Subjects:
+{
+analytics?.subjects || 0
+}
+</p>
+
+
+<p>
+🔥 Streak:
+{
+analytics?.streak || 0
+}
+Days
+</p>
+
+
+
+</div>
 
 
 
@@ -500,30 +532,25 @@ Subject Progress
 
 
 {
-
-subjects.length===0 && (
+subjects.length === 0 ?
 
 <p>
-No subjects yet 🚀
+No study sessions yet
 </p>
 
-)
 
-}
+:
 
-
-
-
-{
-
-subjects.map((sub,index)=>{
+subjects.map(
+(sub,index)=>{
 
 
-const hrs=getSubjectHours(sub);
+const hrs =
+getSubjectHours(sub);
 
 
 
-return(
+return (
 
 <div
 
@@ -546,19 +573,17 @@ justifyContent:"space-between"
 
 >
 
-
-<h3>
+<span>
 {sub}
-</h3>
+</span>
 
 
-<p>
+<span>
 {hrs} hrs
-</p>
+</span>
 
 
 </div>
-
 
 
 
@@ -571,22 +596,22 @@ className="progress-fill"
 
 style={{
 
-width:`${Math.min(hrs*10,100)}%`
+width:
+`${Math.min(hrs*10,100)}%`
 
 }}
 
 >
 
-</div>
-
 
 </div>
 
 
+</div>
+
 
 
 </div>
-
 
 )
 
@@ -597,8 +622,8 @@ width:`${Math.min(hrs*10,100)}%`
 
 
 
-</div>
 
+</div>
 
 
 
@@ -615,58 +640,37 @@ Study History
 </h2>
 
 
-
 {
 
-sessions.length===0 &&
+sessions.length===0 ?
 
 <p>
-No study sessions yet 🚀
+No sessions added yet
 </p>
 
-}
 
+:
 
+sessions.map(
+(item,index)=>(
 
+<p key={index}>
 
-
-{
-
-sessions.map((item,index)=>(
-
-
-<div
-
-className="study-item"
-
-key={index}
-
->
-
-
-<h3>
 {item.subject}
-</h3>
-
-
-<p>
+-
 {item.hours} hrs
+
 </p>
 
+)
 
-
-</div>
-
-
-
-))
+)
 
 }
 
 
 
 </div>
-
 
 
 
@@ -682,13 +686,13 @@ data={todayData}
 
 
 
-
 </div>
 
-)
+
+);
+
 
 }
-
 
 
 export default StudyPage;

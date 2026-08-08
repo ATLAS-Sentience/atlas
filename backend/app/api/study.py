@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.models.study import StudySession, StudyGoal
 
 from app.schemas.study import (
     StudySessionCreate,
@@ -78,8 +79,46 @@ def study_analytics(
     db: Session = Depends(get_db)
 ):
 
+    sessions = db.query(
+        StudySession
+    ).all()
+
+
+    total_hours = sum(
+        session.hours
+        for session in sessions
+    )
+
+
+    subjects = len(
+        set(
+            session.subject
+            for session in sessions
+        )
+    )
+
+
+    streak = 0
+
+    if sessions:
+        streak = 1
+
+
+
+    return {
+        "total_hours": total_hours,
+        "subjects": subjects,
+        "streak": streak
+    }
+
     sessions = db.query(StudySession).all()
 
+@router.get("/study/goal")
+def get_goal(
+    db: Session = Depends(get_db)
+):
+
+    return db.query(StudyGoal).first()
 
     total_hours = sum(
         session.hours
