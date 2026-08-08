@@ -1,314 +1,396 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/settings.css";
 
-
-function SettingsPage(){
-
-
-const [username,setUsername]=useState(
-    localStorage.getItem("username") || "Atlas User"
-);
+import {
+    getProfile,
+    updateProfile
+} from "../services/settingsAPI";
 
 
-const [email,setEmail]=useState(
-    localStorage.getItem("email") || "user@example.com"
-);
+function SettingsPage() {
+
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+
+    const [darkMode, setDarkMode] = useState(true);
+    const [studyReminder, setStudyReminder] = useState(true);
+    const [taskAlert, setTaskAlert] = useState(true);
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState("");
 
 
-const [darkMode,setDarkMode]=useState(true);
+    useEffect(() => {
 
-const [studyReminder,setStudyReminder]=useState(true);
+        async function loadProfile() {
 
-const [taskAlert,setTaskAlert]=useState(true);
+            try {
+
+                const profile = await getProfile();
+
+                setUsername(profile.username || "");
+                setEmail(profile.email || "");
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load profile:",
+                    error
+                );
+
+                setMessage(
+                    "Unable to load profile"
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        }
 
 
+        loadProfile();
+
+    }, []);
 
 
+    async function saveProfile() {
 
-function saveProfile(){
+        if (!username.trim() || !email.trim()) {
 
-    localStorage.setItem(
-        "username",
-        username
+            setMessage(
+                "Username and email are required"
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            setSaving(true);
+            setMessage("");
+
+
+            const updatedProfile =
+                await updateProfile(
+                    username,
+                    email
+                );
+
+
+            setUsername(
+                updatedProfile.username
+            );
+
+            setEmail(
+                updatedProfile.email
+            );
+
+
+            /*
+             * Keep Navbar synchronized
+             * without requiring a refresh.
+             */
+
+            localStorage.setItem(
+                "username",
+                updatedProfile.username
+            );
+
+
+            localStorage.setItem(
+                "email",
+                updatedProfile.email
+            );
+
+
+            window.dispatchEvent(
+                new Event("profileUpdated")
+            );
+
+
+            setMessage(
+                "Profile updated successfully"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Failed to update profile:",
+                error
+            );
+
+
+            setMessage(
+                "Failed to update profile"
+            );
+
+
+        } finally {
+
+            setSaving(false);
+
+        }
+
+    }
+
+
+    function clearLocalData() {
+
+        localStorage.removeItem(
+            "username"
+        );
+
+        localStorage.removeItem(
+            "email"
+        );
+
+
+        window.dispatchEvent(
+            new Event("profileUpdated")
+        );
+
+
+        setMessage(
+            "Local data cleared"
+        );
+
+    }
+
+
+    if (loading) {
+
+        return (
+
+            <div className="settings-container">
+
+                <h1>
+                    ⚙️ Settings
+                </h1>
+
+                <p className="settings-subtitle">
+                    Loading settings...
+                </p>
+
+            </div>
+
+        );
+
+    }
+
+
+    return (
+
+        <div className="settings-container">
+
+
+            <h1>
+                ⚙️ Settings
+            </h1>
+
+
+            <p className="settings-subtitle">
+                Customize your Atlas experience
+            </p>
+
+
+            {message && (
+
+                <p className="settings-message">
+                    {message}
+                </p>
+
+            )}
+
+
+            {/* PROFILE */}
+
+            <div className="settings-card">
+
+                <h2>
+                    👤 Profile
+                </h2>
+
+
+                <div className="setting-item">
+
+                    <p>
+                        Username
+                    </p>
+
+
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) =>
+                            setUsername(e.target.value)
+                        }
+                        placeholder="Enter username"
+                    />
+
+                </div>
+
+
+                <div className="setting-item">
+
+                    <p>
+                        Email
+                    </p>
+
+
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
+                        placeholder="Enter email"
+                    />
+
+                </div>
+
+
+                <button
+                    onClick={saveProfile}
+                    disabled={saving}
+                >
+
+                    {saving
+                        ? "Saving..."
+                        : "Save Profile"
+                    }
+
+                </button>
+
+
+            </div>
+
+
+            {/* APPEARANCE */}
+
+            <div className="settings-card">
+
+                <h2>
+                    🎨 Appearance
+                </h2>
+
+
+                <div className="setting-item">
+
+                    <p>
+                        Dark Mode
+                    </p>
+
+
+                    <button
+                        onClick={() =>
+                            setDarkMode(!darkMode)
+                        }
+                    >
+
+                        {darkMode
+                            ? "Enabled"
+                            : "Disabled"
+                        }
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            {/* NOTIFICATIONS */}
+
+            <div className="settings-card">
+
+                <h2>
+                    🔔 Notifications
+                </h2>
+
+
+                <div className="setting-item">
+
+                    <p>
+                        Study Reminders
+                    </p>
+
+
+                    <button
+                        onClick={() =>
+                            setStudyReminder(
+                                !studyReminder
+                            )
+                        }
+                    >
+
+                        {studyReminder
+                            ? "ON"
+                            : "OFF"
+                        }
+
+                    </button>
+
+                </div>
+
+
+                <div className="setting-item">
+
+                    <p>
+                        Task Alerts
+                    </p>
+
+
+                    <button
+                        onClick={() =>
+                            setTaskAlert(
+                                !taskAlert
+                            )
+                        }
+                    >
+
+                        {taskAlert
+                            ? "ON"
+                            : "OFF"
+                        }
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            {/* DATA */}
+
+            <div className="settings-card">
+
+                <h2>
+                    🗂 Data Management
+                </h2>
+
+
+                <button
+                    className="danger-btn"
+                    onClick={clearLocalData}
+                >
+
+                    Clear Local Data
+
+                </button>
+
+            </div>
+
+
+        </div>
+
     );
-
-
-    localStorage.setItem(
-        "email",
-        email
-    );
-
-
-    window.dispatchEvent(
-        new Event("profileUpdated")
-    );
-
-}
-
-
-
-
-
-return(
-
-<div className="settings-container">
-
-
-<h1>
-⚙️ Settings
-</h1>
-
-
-<p className="settings-subtitle">
-Customize your Atlas experience
-</p>
-
-
-
-
-
-<div className="settings-card">
-
-
-<h2>
-👤 Profile
-</h2>
-
-
-
-
-<div className="setting-item">
-
-<p>
-Username
-</p>
-
-
-<input
-
-value={username}
-
-onChange={(e)=>setUsername(e.target.value)}
-
-/>
-
-</div>
-
-
-
-
-
-<div className="setting-item">
-
-<p>
-Email
-</p>
-
-
-<input
-
-value={email}
-
-onChange={(e)=>setEmail(e.target.value)}
-
-/>
-
-</div>
-
-
-
-
-<button
-onClick={saveProfile}
->
-
-Save Profile
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="settings-card">
-
-
-<h2>
-🎨 Appearance
-</h2>
-
-
-
-<div className="setting-item">
-
-
-<p>
-Dark Mode
-</p>
-
-
-
-<button
-
-onClick={()=>setDarkMode(!darkMode)}
-
->
-
-{
-
-darkMode
-
-?
-
-"Enabled"
-
-:
-
-"Disabled"
-
-}
-
-</button>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="settings-card">
-
-
-<h2>
-🔔 Notifications
-</h2>
-
-
-
-
-<div className="setting-item">
-
-<p>
-Study Reminders
-</p>
-
-
-<button
-
-onClick={()=>setStudyReminder(!studyReminder)}
-
->
-
-{
-
-studyReminder
-
-?
-
-"ON"
-
-:
-
-"OFF"
-
-}
-
-</button>
-
-
-</div>
-
-
-
-
-
-<div className="setting-item">
-
-<p>
-Task Alerts
-</p>
-
-
-<button
-
-onClick={()=>setTaskAlert(!taskAlert)}
-
->
-
-{
-
-taskAlert
-
-?
-
-"ON"
-
-:
-
-"OFF"
-
-}
-
-</button>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="settings-card">
-
-
-<h2>
-🗂 Data Management
-</h2>
-
-
-
-<button className="danger-btn">
-
-Clear Local Data
-
-</button>
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-)
 
 }
 

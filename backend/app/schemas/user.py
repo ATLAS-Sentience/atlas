@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
+
 class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+
 
 class UserResponse(BaseModel):
     id: int
@@ -12,3 +14,8 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    username: str
+    email: str
