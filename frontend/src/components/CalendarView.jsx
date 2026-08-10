@@ -1,19 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EventModal from "./EventModal";
 import "../styles/calendar.css";
+import {
+    getCalendarEvents,
+    addCalendarEvent
+} from "../services/calendarAPI";
 
 
 function CalendarView(){
 
     const today = new Date();
 
-    const [currentDate,setCurrentDate] = useState(today);
+   const [currentDate] = useState(today);
 
     const [selectedDate,setSelectedDate] = useState(null);
 
     const [showModal,setShowModal] = useState(false);
 
     const [events,setEvents] = useState([]);
+    useEffect(() => {
+
+    async function loadEvents() {
+
+        try {
+
+            const data = await getCalendarEvents();
+
+            setEvents(data);
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load calendar events:",
+                error
+            );
+
+        }
+
+    }
+
+    loadEvents();
+
+}, []);
 
 
 
@@ -56,17 +84,34 @@ function CalendarView(){
 
 
 
-    function addEvent(event){
+    async function addEvent(event) {
+
+    try {
+
+        const newEvent = {
+            title: event.title,
+            time: event.time,
+            category: event.category,
+            date: selectedDate
+        };
+
+        const savedEvent = await addCalendarEvent(newEvent);
 
         setEvents([
             ...events,
-            {
-                ...event,
-                date:selectedDate
-            }
+            savedEvent
         ]);
 
+    } catch (error) {
+
+        console.error(
+            "Failed to save calendar event:",
+            error
+        );
+
     }
+
+}
 
 
 

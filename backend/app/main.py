@@ -9,6 +9,8 @@ from app.api.finance import router as finance_router
 from app.api.study import router as study_router
 from app.models.user import User
 from app.models.study import StudySession, StudyGoal
+from app.models.calendar import CalendarEvent
+from app.api import calendar
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -34,6 +36,7 @@ app.include_router(users.router)
 app.include_router(models.router)
 app.include_router(finance_router)
 app.include_router(study_router)
+app.include_router(calendar.router)
 
 # Root endpoint
 @app.get("/")

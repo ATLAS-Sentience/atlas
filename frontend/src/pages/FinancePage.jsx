@@ -2,6 +2,7 @@ import { useState } from "react";
 import FinanceChart from "../components/FinanceChart";
 import "../styles/finance.css";
 import ExpenseChart from "../components/ExpenseChart";
+import { calculateFinance } from "../services/financeAPI";
 
 function FinancePage() {
 
@@ -19,42 +20,25 @@ function FinancePage() {
     const [goalSaved, setGoalSaved] = useState("");
 
     const [analyzed, setAnalyzed] = useState(false);
+    const [financeData, setFinanceData] = useState(null);
+const [loading, setLoading] = useState(false);
 
 
-    const remaining =
-        salary && expense
-        ? Number(salary) - Number(expense)
-        : 0;
+    const remaining = financeData?.remaining ?? 0;
 
+const savingRate = financeData?.saving_rate ?? 0;
 
-    const savingRate =
-        salary && savings
-        ? ((Number(savings) / Number(salary)) * 100).toFixed(2)
-        : 0;
-
-
-    const expenseRatio =
-        salary && expense
-        ? ((Number(expense) / Number(salary)) * 100).toFixed(2)
-        : 0;
-
+const expenseRatio = financeData?.expense_ratio ?? 0;
 
     // Financial Health Score
-    let healthScore = 0;
-
-    if(savingRate >= 30){
-        healthScore = 90;
-    }
-    else if(savingRate >=20){
-        healthScore = 75;
-    }
-    else if(savingRate >=10){
-        healthScore = 60;
-    }
-    else{
-        healthScore = 40;
-    }
-
+    const healthScore =
+    savingRate >= 30
+        ? 90
+        : savingRate >= 20
+        ? 75
+        : savingRate >= 10
+        ? 60
+        : 40;
 
     // Savings prediction
 
@@ -131,11 +115,38 @@ function FinancePage() {
 
 
             <button
-            onClick={()=>setAnalyzed(true)}
-            >
-                Analyze Finance
-            </button>
+    onClick={async () => {
 
+        if (!salary || !savings || !expense) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const data = await calculateFinance({
+                salary: Number(salary),
+                savings: Number(savings),
+                expense: Number(expense),
+                food: Number(food || 0),
+                rent: Number(rent || 0),
+                travel: Number(travel || 0),
+                other: Number(other || 0)
+            });
+
+            setFinanceData(data);
+            setAnalyzed(true);
+
+        } catch (error) {
+            console.error("Finance calculation failed:", error);
+        } finally {
+            setLoading(false);
+        }
+
+    }}
+>
+    {loading ? "Analyzing..." : "Analyze Finance"}
+</button>
 
         </div>
 
