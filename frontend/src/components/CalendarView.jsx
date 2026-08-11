@@ -11,8 +11,7 @@ function CalendarView(){
 
     const today = new Date();
 
-   const [currentDate] = useState(today);
-
+  const [currentDate, setCurrentDate] = useState(today);
     const [selectedDate,setSelectedDate] = useState(null);
 
     const [showModal,setShowModal] = useState(false);
@@ -153,10 +152,33 @@ return(
 <div className="calendar-card">
 
 
-<h2>
-📅 {monthName} {year}
-</h2>
+<div className="calendar-header">
 
+    <button
+        onClick={() =>
+            setCurrentDate(
+                new Date(year, month - 1, 1)
+            )
+        }
+    >
+        ←
+    </button>
+
+    <h2>
+        📅 {monthName} {year}
+    </h2>
+
+    <button
+        onClick={() =>
+            setCurrentDate(
+                new Date(year, month + 1, 1)
+            )
+        }
+    >
+        →
+    </button>
+
+</div>
 
 
 <div className="today-box">
